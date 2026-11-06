@@ -1,5 +1,6 @@
 import express from "express";
 import { z } from "zod";
+import { prisma } from "./prisma.js";
 
 const app = express();
 
@@ -15,7 +16,7 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-app.post("/notes", (req, res) => {
+app.post("/notes", async (req, res) => {
   const result = noteSchema.safeParse(req.body);
 
   if (!result.success) {
@@ -26,7 +27,9 @@ app.post("/notes", (req, res) => {
       details: `${issue.path.join(".")}: ${issue.message}`,
     });
   }
-  res.status(201).json(result.data);
+  const note = await prisma.notes.create({ data: result.data });
+
+  res.status(201).json(note);
 });
 
 app.listen(3000, () => {
