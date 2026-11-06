@@ -12,8 +12,9 @@ const noteSchema = z.object({
   tag: z.enum(["important", "general", "todo"]).default("general"),
 });
 
-app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
+app.get("/notes", async (req, res) => {
+  const getNote = await prisma.notes.findMany();
+  res.json(getNote);
 });
 
 app.post("/notes", async (req, res) => {
