@@ -17,6 +17,24 @@ app.get("/notes", async (req, res) => {
   res.json(getNote);
 });
 
+app.get("/notes/:id", async (req, res) => {
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id)) {
+    return res.status(400).json({error: "Incorrect format", details: "No id number found"})
+  }
+
+  const note = await prisma.notes.findUnique({ where: { id } });
+
+  if (!note) {
+    return res
+      .status(404)
+      .json({ error: "No note was found", details: `no note with id ${id}` });
+  }
+
+  res.json(note);
+});
+
 app.post("/notes", async (req, res) => {
   const result = noteSchema.safeParse(req.body);
 
